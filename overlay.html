@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="bg">
+<head>
+    <meta charset="UTF-8">
+    <title>PixelStream Studio Overlay</title>
+    <script src="https://socket.io"></script>
+    <script src="https://tailwindcss.com"></script>
+    <style>
+        body { background: transparent; color: #10b981; font-family: monospace; overflow: hidden; }
+        .neon-purple { text-shadow: 0 0 12px #c084fc; box-shadow: 0 0 15px rgba(192, 132, 252, 0.2); }
+        .neon-emerald { text-shadow: 0 0 12px #34d399; box-shadow: 0 0 15px rgba(52, 211, 153, 0.2); }
+    </style>
+</head>
+<body class="w-screen h-screen flex flex-col justify-start items-start p-6 gap-6">
+
+    <!-- 🔮 УДЖЕТ 1: СМАРТ ЦЕЛ ЗА АБОНАТИ (Горен ляв ъгъл) -->
+    <div class="bg-black/85 border border-purple-500/40 p-4 rounded-xl w-72 neon-purple">
+        <h2 class="text-xs font-bold uppercase tracking-widest text-purple-400 mb-2">🎯 SUB GOAL</h2>
+        <div class="w-full bg-gray-900 h-3 rounded-full border border-purple-900/40 overflow-hidden mb-1">
+            <div id="goalBar" class="bg-purple-500 h-full transition-all duration-700" style="width: 42%"></div>
+        </div>
+        <div class="flex justify-between text-[10px] text-gray-400">
+            <span>ПРОГРЕС: <span id="goalText" class="text-white font-bold">42</span>/100</span>
+            <span class="text-purple-400 animate-pulse">⚡ LIVE</span>
+        </div>
+    </div>
+
+    <!-- 🕹️ ИГРА 2: ИНТЕРАКТИВЕН КИБЕР БОС (Позициониран под уиджета) -->
+    <div class="bg-black/85 border border-emerald-500/40 p-5 rounded-xl w-72 neon-emerald">
+        <h1 class="text-sm font-bold uppercase tracking-widest text-emerald-400 mb-2">🤖 CYBER BOSS REID</h1>
+        <div class="w-full bg-gray-900 h-5 rounded-full border border-emerald-900/40 overflow-hidden mb-2">
+            <div id="bossBar" class="bg-emerald-500 h-full w-full transition-all duration-300"></div>
+        </div>
+        <div class="flex justify-between text-xs items-center">
+            <span class="text-gray-400">HP: <span id="bossHp" class="text-white font-bold">100</span>%</span>
+            <span id="logText" class="text-[10px] text-amber-400 truncate max-w-[160px]">Очакване на !attack...</span>
+        </div>
+    </div>
+
+    <script>
+        // Свързване в реално време със софтуерната ти база
+        const socket = io();
+
+        // Слушател за играта с Боса
+        socket.on('boss_update', (data) => {
+            document.getElementById('bossBar').style.width = data.health + '%';
+            document.getElementById('bossHp').innerText = data.health;
+            document.getElementById('logText').innerText = `💥 ${data.attacker} УДРИ!`;
+            
+            if(data.health < 40) {
+                document.getElementById('bossBar').className = "bg-red-500 h-full transition-all duration-300";
+            } else {
+                document.getElementById('bossBar').className = "bg-emerald-500 h-full transition-all duration-300";
+            }
+        });
+
+        // Слушател за смарт уиджета за абонати
+        socket.on('goal_update', (data) => {
+            document.getElementById('goalBar').style.width = data.current + '%';
+            document.getElementById('goalText').innerText = data.current;
+        });
+    </script>
+</body>
+</html>
